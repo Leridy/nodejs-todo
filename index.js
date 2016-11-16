@@ -16,6 +16,11 @@ app.get('/', function (req, res) {
     res.render('index');
 });
 
+app.get('/c/:module',function (req,res) {
+    res.send("hello");
+    console.log(req.accepts()+res)
+});
+
 // 设置views路径和模板
 app.set('views', './client/view');
 app.set('view engine', 'html');
