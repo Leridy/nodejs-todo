@@ -2,6 +2,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var store = require('../../store/main');
 var deposit = require('../../deposit/main');
+var deleteTodo = require('../../delete/main');
 
 //
 class TodoItems extends React.Component {
@@ -9,10 +10,12 @@ class TodoItems extends React.Component {
         var todoPanel = this.props.entries;
 
         function creatTasks(item) {
-            return <li className="todo-item" key={item.key}>{item.todo} <span className="todo-cancel" title="取消">X</span></li>
+            return <li className="todo-item" key={item.key}>{item.todo}
+                <span className="todo-cancel" title="取消"
+                      onClick={item.option.bind(this, item.key)}>X</span></li>
         }
 
-        var listItems = todoPanel.reverse().map(creatTasks);
+        var listItems = todoPanel.map(creatTasks);
         return (
             <ul className="todo-list">
                 {listItems}
@@ -32,24 +35,34 @@ class TodoList extends React.Component {
     }
 
     addItem(e) {
-        var itemArray = this.state.items;
+        var toDoListArr = this.state.items;
         var item = {
             todo: this._inputElement.value,
-            key: Date.now()
+            key: Date.now(),
+            option: this.deleteItem
         };
+        if(item.todo === ""){
+            item = null;
+        }else{
+            toDoListArr.push(item);
+        }
 
-        itemArray.push(item);
 
         this.setState({
-            items: itemArray
+            items: toDoListArr
         });
 
+
         this._inputElement.value = '';
-
-
         e.preventDefault();
         deposit.setTodo(item);
+
     }
+
+    deleteItem(key) {
+        deleteTodo.deleteTodos(key);
+        location.reload();
+    };
 
     getData() {
         var self = this;
@@ -58,21 +71,20 @@ class TodoList extends React.Component {
                 var i = 0;
                 var len = data.length;
                 var toDoListArr = [];
-                for(; i<len; i++) {
+                for (; i < len; i++) {
                     toDoListArr.push(
                         {
                             todo: data[i].todo,
-                            key:data[i].key
+                            key: data[i].key,
+                            option: self.deleteItem
                         }
                     );
                 }
 
                 self.setState(
                     {
-                        items : toDoListArr
+                        items: toDoListArr
                     });
-
-                console.log('Getdata run')
             });
     }
 
